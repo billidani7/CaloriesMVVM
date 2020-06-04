@@ -1,5 +1,13 @@
 ## MVVM pattern
 
+<p align="center">
+<img src="screen-1.png" width="280"> 
+<img src="screen-2.png" width="280" hspace="20">
+<img src="screen-3.png" width="280">
+</p>
+
+
+
 The _Model-View-ViewModel_ (MVVM) pattern is a UI design pattern. It’s a member of a larger family of patterns collectively known as _MV*_, these include [Model View Controller](http://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller) (MVC), [Model View Presenter](http://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93presenter) (MVP) and a number of others.
 
 Each of these patterns addresses separating UI logic from business logic in order to make apps easier to develop and test.
