@@ -53,14 +53,27 @@ class AddMealViewModel: ObservableObject {
     
     private var disposables = Set<AnyCancellable>()
 
-	init() {
+    init() {
 		//3
-        $searchText
-            .dropFirst(1) //4
-            //5
-            .debounce(for: .seconds(0.5), scheduler: DispatchQueue.main) 
-            .sink(receiveValue: searchAction(forFood:)) //6
-            .store(in: &disposables) //7
+	$searchText
+	    .dropFirst(1) //4
+	    //5
+	    .debounce(for: .seconds(0.5), scheduler: DispatchQueue.main) 
+	    .sink(receiveValue: searchAction(forFood:)) //6
+	    .store(in: &disposables) //7
+    }
+    
+    func searchAction(forFood query: String) {
+                
+        searchCancellable = FDCClient
+            .searchFoods(query: query)
+            .replaceError(with: [Food]())
+            .map{$0.foods}
+            .subscribe(on: DispatchQueue.global())
+            .receive(on: DispatchQueue.main)
+            .assign(to: \.foodResults, on: self)
+                                
+
     }
 }
 ```
