@@ -33,7 +33,7 @@ We will start with the model layer and move upwards to the UI.
 ### Model
 ```swift
 struct Food: Codable {
-	name: String
+    name: String
 }
 ```
 
@@ -66,7 +66,7 @@ class AddMealViewModel: ObservableObject {
     func searchAction(forFood query: String) {
                 
         searchCancellable = FDCClient
-            .searchFoods(query: query)
+            .searchFoods(query: query) //8
             .replaceError(with: [Food]())
             .map{$0.foods}
             .subscribe(on: DispatchQueue.global())
@@ -91,6 +91,8 @@ class AddMealViewModel: ObservableObject {
 
 7.  Think of  `disposables`  as a collection of references to requests. Without keeping these references, the network requests you’ll make won’t be kept alive, preventing you from getting responses from the server.
 
+8. `searchFoods(query:)` method makes the API Call. See details below. 
+
 ### View
 ```swift
 struct AddMealView: View {
@@ -113,3 +115,47 @@ struct AddMealView: View {
 1. ObservedObject is a property wrapper type that subscribes to an observable object and invalidates a view whenever the observable object changes. In other words, when the `AddMealViewModel` changes, the view will observe its changes.
 
 2. `$viewModel.searchText` establishes a connection between the values you’re typing in the `TextField` and the `AddMealViewModel`‘s `searchText` property. Using `$`allows you to turn the `searchText` property into a `Binding<String>`. This is only possible because `AddMealViewModel` conforms to `ObservableObject` and is declared with the `@ObservedObject` property wrapper.
+
+### API 
+For nutrient data we are going to use FoodData Central database. Its an integrated data system that provides expanded nutrient profile data from [U.S. DEPARTMENT OF AGRICULTURE](https://fdc.nal.usda.gov/api-guide.html). The FoodData Central API provides REST access. The API spec is also available on SwaggerHub [here](https://app.swaggerhub.com/apis/fdcnal/food-data_central_api/1.0.0)
+
+We will start by defining a protocol with the API actions.
+
+```swift
+protocol FDCActions {
+    static func searchFoods(query: String) -> AnyPublisher<FDCSearchFoodResponce, APIError>
+    static func getFoodDetail(id: Int) -> AnyPublisher<FoodDetail, APIError>
+}
+```
+We wil use the first method to search for foods and the second in order to get details when the user taps on a specific food. The result type of each method is a Publisher. The first parameter refers to the type it returns if the computation is successful and the second refers to the type if it fails.
+```swift
+struct FDCClient: FDCActions {
+	
+	private static let jsonDecoder = JSONDecoder()
+	
+	public static func searchFoods(query: String) -> AnyPublisher<FDCSearchFoodResponce, APIError> {
+        
+		let baseURL = URL(string: "https://api.nal.usda.gov/fdc/v1/foods/search")!
+		var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: true)
+		components!.queryItems = [
+		    URLQueryItem(name: "api_key", value: "xxxx"),
+		    URLQueryItem(name: "dataType", value: "SR Legacy"),
+		    URLQueryItem(name: "query", value: query),
+
+		]
+
+		    //1
+		return URLSession.shared.dataTaskPublisher(for: components!.url!) 
+		.map { $0.data } //2
+		.decode(type: FDCSearchFoodResponce.self, decoder: jsonDecoder)//3
+		.mapError{ APIError.parseError(reason: "\($0)") } //4
+		.eraseToAnyPublisher() //5
+    }
+    
+}
+```
+1.   Uses the new  `URLSession`  method  `dataTaskPublisher(for:)`  to fetch the data. This method takes an instance of  `URLRequest`  and returns either a tuple  `(Data, URLResponse)`  or a  `URLError`.
+2. Map the returned `Data`
+3. The returned data is in JSON format. We use `JSONDecoder` to decode the response to an Object of type `FDCSearchFoodResponce`. This type conforms to `Codable` . So we are able to decode the response to our custom type.
+4. If an error occurred , we use `mapError` method to handle it.
+5. `eraseToAnyPublisher()` exposes an instance of [`AnyPublisher`](https://developer.apple.com/documentation/combine/anypublisher) to the downstream subscriber, rather than this publisher’s actual type.
