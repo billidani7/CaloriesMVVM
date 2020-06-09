@@ -10,7 +10,9 @@
 
 The _Model-View-ViewModel_ (MVVM) pattern is a UI design pattern. It’s a member of a larger family of patterns collectively known as _MV*_, these include [Model View Controller](http://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller) (MVC), [Model View Presenter](http://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93presenter) (MVP) and a number of others.
 
-Each of these patterns addresses separating UI logic from business logic in order to make apps easier to develop and test.
+Each of these patterns addresses separating UI logic from business logic in order to make apps easier to develop and test. 
+
+One of my favorite design patterns is Flux/Redux. Take a look another sample I have made [here](https://github.com/billidani7/MoviesComposableArchitecture).
 
 MVVM programming with View Models is the new pattern that Apple is recommending developers follow after WWDC this year.
 
@@ -159,3 +161,7 @@ struct FDCClient: FDCActions {
 3. The returned data is in JSON format. We use `JSONDecoder` to decode the response to an Object of type `FDCSearchFoodResponce`. This type conforms to `Codable` . So we are able to decode the response to our custom type.
 4. If an error occurred , we use `mapError` method to handle it.
 5. `eraseToAnyPublisher()` exposes an instance of [`AnyPublisher`](https://developer.apple.com/documentation/combine/anypublisher) to the downstream subscriber, rather than this publisher’s actual type.
+
+
+### Links
+[Stanford University Lecture](https://www.youtube.com/watch?v=4GjXq2Sr55Q)
