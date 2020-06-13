@@ -75,7 +75,7 @@ class AddMealViewModel: ObservableObject {
             .map{$0.foods}
             .subscribe(on: DispatchQueue.global())
             .receive(on: DispatchQueue.main) //9
-            .assign(to: \.foodResults, on: self)
+            .assign(to: \.foodResults, on: self) //10
                                 
 
     }
@@ -108,6 +108,8 @@ Source code explanation:
 8. `searchFoods(query:)` method makes the API Call. See details below. 
 
 9. Fetching data from the server, or parsing a blob of JSON, happens on a background queue, updating the UI must happen on the main queue. 
+
+10. Takes the results it receives from the publisher chain and assigns them to the `foodResults` array.
 
 ## View
 ```swift
