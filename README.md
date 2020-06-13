@@ -1,3 +1,7 @@
+The purpose of this demo is to show the basic aspects of MVVM Architecture using SwiftUI & Combine framework. 
+
+As I was looking for a nice design in order to make a demo for MVVM Architecture, I found this [template](https://ui8.net/emer-dang/products/iofit---diet--training-app-ui-kit). I exported some basic assets/icons. I made the rest of the design through SwiftUI (Views and Modifiers). 
+
 ## MVVM pattern
 
 <p align="center">
@@ -12,7 +16,7 @@ The _Model-View-ViewModel_ (MVVM) pattern is a UI design pattern. It’s a membe
 
 Each of these patterns addresses separating UI logic from business logic in order to make apps easier to develop and test. 
 
-One of my favorite design patterns is Flux/Redux. Take a look another sample I have made [here](https://github.com/billidani7/MoviesComposableArchitecture).
+One of my favorite design patterns is Flux/Redux. Take a look at another sample I have made [here](https://github.com/billidani7/MoviesComposableArchitecture).
 
 MVVM programming with View Models is the new pattern that Apple is recommending developers follow after WWDC this year.
 
@@ -32,14 +36,14 @@ Let’s consider a quick example of the MVVM module for a SwiftUI app. We will c
 
 We will start with the model layer and move upwards to the UI.
 
-### Model
+## Model
 ```swift
 struct Food: Codable {
     name: String
 }
 ```
 
-### View Model
+## View Model
 ```swift
 // 1
 class AddMealViewModel: ObservableObject {
@@ -79,6 +83,16 @@ class AddMealViewModel: ObservableObject {
     }
 }
 ```
+Let's get started with a quick look on Apple documentation about Combine. 
+
+According to the Apple documentation: 
+> The Combine framework provides a declarative Swift API for processing
+> values over time. These values can represent many kinds of
+> asynchronous events. Combine declares publishers to expose values that
+> can change over time, and subscribers to receive those values from the
+> publishers.
+
+Source code explanation: 
 1. `ObservableObject` is a protocol that’s part of the **Combine** framework. It is used within a custom class/model to keep track of the state.
 
 2. `@Published` is one of the most useful property wrappers in SwiftUI, allowing us to create observable objects that automatically announce when changes occur. Because the property is marked `@Published`, the compiler automatically synthesizes a publisher for it. SwiftUI subscribes to that publisher and and re-invoke the `body` property of any views that rely on the data.
@@ -95,7 +109,7 @@ class AddMealViewModel: ObservableObject {
 
 8. `searchFoods(query:)` method makes the API Call. See details below. 
 
-### View
+## View
 ```swift
 struct AddMealView: View {
 	//1
@@ -118,7 +132,7 @@ struct AddMealView: View {
 
 2. `$viewModel.searchText` establishes a connection between the values you’re typing in the `TextField` and the `AddMealViewModel`‘s `searchText` property. Using `$`allows you to turn the `searchText` property into a `Binding<String>`. This is only possible because `AddMealViewModel` conforms to `ObservableObject` and is declared with the `@ObservedObject` property wrapper.
 
-### API 
+## API 
 For nutrient data we are going to use FoodData Central database. Its an integrated data system that provides expanded nutrient profile data from [U.S. DEPARTMENT OF AGRICULTURE](https://fdc.nal.usda.gov/api-guide.html). The FoodData Central API provides REST access. The API spec is also available on SwaggerHub [here](https://app.swaggerhub.com/apis/fdcnal/food-data_central_api/1.0.0)
 
 We will start by defining a protocol with the API actions.
@@ -164,4 +178,8 @@ struct FDCClient: FDCActions {
 
 
 ### Links
-[Stanford University Lecture](https://www.youtube.com/watch?v=4GjXq2Sr55Q)
+- [Stanford University Lecture](https://www.youtube.com/watch?v=4GjXq2Sr55Q) 
+- [Apple Combine Framework](https://developer.apple.com/documentation/combine)
+
+## What's next
+If you are interested for one more powerfull design pattern, take a look [here](https://github.com/billidani7/MoviesComposableArchitecture).
