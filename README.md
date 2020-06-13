@@ -74,7 +74,7 @@ class AddMealViewModel: ObservableObject {
             .replaceError(with: [Food]())
             .map{$0.foods}
             .subscribe(on: DispatchQueue.global())
-            .receive(on: DispatchQueue.main)
+            .receive(on: DispatchQueue.main) //9
             .assign(to: \.foodResults, on: self)
                                 
 
@@ -106,6 +106,8 @@ Source code explanation:
 7.  Think of  `disposables`  as a collection of references to requests. Without keeping these references, the network requests you’ll make won’t be kept alive, preventing you from getting responses from the server.
 
 8. `searchFoods(query:)` method makes the API Call. See details below. 
+
+9. Fetching data from the server, or parsing a blob of JSON, happens on a background queue, updating the UI must happen on the main queue. 
 
 ## View
 ```swift
