@@ -1,8 +1,6 @@
 The purpose of this demo is to show the basic aspects of MVVM Architecture using SwiftUI & Combine framework. 
 
-As I was looking for a nice design in order to make a demo for MVVM Architecture, I found this [template](https://ui8.net/emer-dang/products/iofit---diet--training-app-ui-kit). I exported some basic assets/icons. I made the rest of the design through SwiftUI (Views and Modifiers). 
-
-## MVVM pattern
+As I was looking for a nice design for this demo, I found this beautiful [template](https://ui8.net/emer-dang/products/iofit---diet--training-app-ui-kit). I exported some basic assets/icons. I made the rest of the design through SwiftUI (Views and Modifiers). 
 
 <p align="center">
 <img src="screen-1.png" width="280"> 
@@ -10,7 +8,7 @@ As I was looking for a nice design in order to make a demo for MVVM Architecture
 <img src="screen-3.png" width="280">
 </p>
 
-
+## MVVM pattern
 
 The _Model-View-ViewModel_ (MVVM) pattern is a UI design pattern. It’s a member of a larger family of patterns collectively known as _MV*_, these include [Model View Controller](http://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller) (MVC), [Model View Presenter](http://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93presenter) (MVP) and a number of others.
 
