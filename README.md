@@ -1,8 +1,20 @@
+The purpose of this demo is to show the basic aspects of MVVM Architecture using SwiftUI & Combine framework. 
+
+As I was looking for a nice design for this demo, I found this beautiful [template](https://ui8.net/emer-dang/products/iofit---diet--training-app-ui-kit). I exported some basic assets/icons. I made the rest of the design through SwiftUI (Views and Modifiers). 
+
+<p align="center">
+<img src="screen-1.png" width="280"> 
+<img src="screen-2.png" width="280" hspace="20">
+<img src="screen-3.png" width="280">
+</p>
+
 ## MVVM pattern
 
 The _Model-View-ViewModel_ (MVVM) pattern is a UI design pattern. It’s a member of a larger family of patterns collectively known as _MV*_, these include [Model View Controller](http://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller) (MVC), [Model View Presenter](http://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93presenter) (MVP) and a number of others.
 
-Each of these patterns addresses separating UI logic from business logic in order to make apps easier to develop and test.
+Each of these patterns addresses separating UI logic from business logic in order to make apps easier to develop and test. 
+
+One of my favorite design patterns is Flux/Redux. Take a look at another sample I have made [here](https://github.com/billidani7/MoviesComposableArchitecture).
 
 MVVM programming with View Models is the new pattern that Apple is recommending developers follow after WWDC this year.
 
@@ -22,14 +34,14 @@ Let’s consider a quick example of the MVVM module for a SwiftUI app. We will c
 
 We will start with the model layer and move upwards to the UI.
 
-### Model
+## Model
 ```swift
 struct Food: Codable {
-	name: String
+    name: String
 }
 ```
 
-### View Model
+## View Model
 ```swift
 // 1
 class AddMealViewModel: ObservableObject {
@@ -45,17 +57,40 @@ class AddMealViewModel: ObservableObject {
     
     private var disposables = Set<AnyCancellable>()
 
-	init() {
+    init() {
 		//3
-        $searchText
-            .dropFirst(1) //4
-            //5
-            .debounce(for: .seconds(0.5), scheduler: DispatchQueue.main) 
-            .sink(receiveValue: searchAction(forFood:)) //6
-            .store(in: &disposables) //7
+	$searchText
+	    .dropFirst(1) //4
+	    //5
+	    .debounce(for: .seconds(0.5), scheduler: DispatchQueue.main) 
+	    .sink(receiveValue: searchAction(forFood:)) //6
+	    .store(in: &disposables) //7
+    }
+    
+    func searchAction(forFood query: String) {
+                
+        searchCancellable = FDCClient
+            .searchFoods(query: query) //8
+            .replaceError(with: [Food]())
+            .map{$0.foods}
+            .subscribe(on: DispatchQueue.global())
+            .receive(on: DispatchQueue.main) //9
+            .assign(to: \.foodResults, on: self) //10
+                                
+
     }
 }
 ```
+Let's get started with a quick look on Apple documentation about Combine. 
+
+According to the Apple documentation: 
+> The Combine framework provides a declarative Swift API for processing
+> values over time. These values can represent many kinds of
+> asynchronous events. Combine declares publishers to expose values that
+> can change over time, and subscribers to receive those values from the
+> publishers.
+
+Source code explanation: 
 1. `ObservableObject` is a protocol that’s part of the **Combine** framework. It is used within a custom class/model to keep track of the state.
 
 2. `@Published` is one of the most useful property wrappers in SwiftUI, allowing us to create observable objects that automatically announce when changes occur. Because the property is marked `@Published`, the compiler automatically synthesizes a publisher for it. SwiftUI subscribes to that publisher and and re-invoke the `body` property of any views that rely on the data.
@@ -70,7 +105,13 @@ class AddMealViewModel: ObservableObject {
 
 7.  Think of  `disposables`  as a collection of references to requests. Without keeping these references, the network requests you’ll make won’t be kept alive, preventing you from getting responses from the server.
 
-### View
+8. `searchFoods(query:)` method makes the API Call. See details below. 
+
+9. Fetching data from the server, or parsing a blob of JSON, happens on a background queue, updating the UI must happen on the main queue. 
+
+10. Takes the results it receives from the publisher chain and assigns them to the `foodResults` array.
+
+## View
 ```swift
 struct AddMealView: View {
 	//1
@@ -92,3 +133,55 @@ struct AddMealView: View {
 1. ObservedObject is a property wrapper type that subscribes to an observable object and invalidates a view whenever the observable object changes. In other words, when the `AddMealViewModel` changes, the view will observe its changes.
 
 2. `$viewModel.searchText` establishes a connection between the values you’re typing in the `TextField` and the `AddMealViewModel`‘s `searchText` property. Using `$`allows you to turn the `searchText` property into a `Binding<String>`. This is only possible because `AddMealViewModel` conforms to `ObservableObject` and is declared with the `@ObservedObject` property wrapper.
+
+## API 
+For nutrient data we are going to use FoodData Central database. Its an integrated data system that provides expanded nutrient profile data from [U.S. DEPARTMENT OF AGRICULTURE](https://fdc.nal.usda.gov/api-guide.html). The FoodData Central API provides REST access. The API spec is also available on SwaggerHub [here](https://app.swaggerhub.com/apis/fdcnal/food-data_central_api/1.0.0)
+
+We will start by defining a protocol with the API actions.
+
+```swift
+protocol FDCActions {
+    static func searchFoods(query: String) -> AnyPublisher<FDCSearchFoodResponce, APIError>
+    static func getFoodDetail(id: Int) -> AnyPublisher<FoodDetail, APIError>
+}
+```
+We wil use the first method to search for foods and the second in order to get details when the user taps on a specific food. The result type of each method is a Publisher. The first parameter refers to the type it returns if the computation is successful and the second refers to the type if it fails.
+```swift
+struct FDCClient: FDCActions {
+	
+	private static let jsonDecoder = JSONDecoder()
+	
+	public static func searchFoods(query: String) -> AnyPublisher<FDCSearchFoodResponce, APIError> {
+        
+		let baseURL = URL(string: "https://api.nal.usda.gov/fdc/v1/foods/search")!
+		var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: true)
+		components!.queryItems = [
+		    URLQueryItem(name: "api_key", value: "xxxx"),
+		    URLQueryItem(name: "dataType", value: "SR Legacy"),
+		    URLQueryItem(name: "query", value: query),
+
+		]
+
+		    //1
+		return URLSession.shared.dataTaskPublisher(for: components!.url!) 
+		.map { $0.data } //2
+		.decode(type: FDCSearchFoodResponce.self, decoder: jsonDecoder)//3
+		.mapError{ APIError.parseError(reason: "\($0)") } //4
+		.eraseToAnyPublisher() //5
+    }
+    
+}
+```
+1.   Uses the new  `URLSession`  method  `dataTaskPublisher(for:)`  to fetch the data. This method takes an instance of  `URLRequest`  and returns either a tuple  `(Data, URLResponse)`  or a  `URLError`.
+2. Map the returned `Data`
+3. The returned data is in JSON format. We use `JSONDecoder` to decode the response to an Object of type `FDCSearchFoodResponce`. This type conforms to `Codable` . So we are able to decode the response to our custom type.
+4. If an error occurred , we use `mapError` method to handle it.
+5. `eraseToAnyPublisher()` exposes an instance of [`AnyPublisher`](https://developer.apple.com/documentation/combine/anypublisher) to the downstream subscriber, rather than this publisher’s actual type.
+
+
+### Links
+- [Stanford University Lecture](https://www.youtube.com/watch?v=4GjXq2Sr55Q) 
+- [Apple Combine Framework](https://developer.apple.com/documentation/combine)
+
+## What's next
+If you are interested for one more powerfull design pattern, take a look [here](https://github.com/billidani7/MoviesComposableArchitecture).
