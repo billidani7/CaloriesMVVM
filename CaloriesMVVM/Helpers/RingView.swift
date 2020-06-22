@@ -35,6 +35,7 @@ struct RingView: View {
             Text("\(Int(percent))%")
                 .font(.system(size: 14 * multiplier))
                 .fontWeight(.bold)
+                .foregroundColor(Color.black)
                 .onTapGesture {
                     self.show.toggle()
             }

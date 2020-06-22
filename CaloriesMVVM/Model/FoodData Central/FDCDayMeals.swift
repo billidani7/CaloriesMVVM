@@ -7,14 +7,87 @@
 //
 
 import Foundation
+import WatchConnectivity
 
+protocol SessionActions {
+    func sendMessage(_ message: [String: Any])
+}
 
-class FDCDayMeals: ObservableObject {
+extension SessionActions {
+        
+    func sendMessage(_ message: [String : Any]) {
+        
+        guard WCSession.default.activationState == .activated else {
+            print("WCSession is not activeted yet!")
+            return
+            //return handleSessionUnactivated(with: commandStatus)
+        }
+        
+        WCSession.default.sendMessage(message, replyHandler: { replyMessage in
+            print("WCSession.default.sendMessage = \(replyMessage)")
+//            commandStatus.phrase = .replied
+//            commandStatus.timedColor = TimedColor(replyMessage)
+//            self.postNotificationOnMainQueueAsync(name: .dataDidFlow, object: commandStatus)
+
+        }, errorHandler: { error in
+            print("WCSession.default.sendMessage Error = \(error.localizedDescription)")
+//            commandStatus.phrase = .failed
+//            commandStatus.errorMessage = error.localizedDescription
+//            self.postNotificationOnMainQueueAsync(name: .dataDidFlow, object: commandStatus)
+        })
+        //postNotificationOnMainQueueAsync(name: .dataDidFlow, object: commandStatus)
+    }
     
-    @Published var breakfastFoods: [FDCSelectedFood] = []
-    @Published var lunchFoods: [FDCSelectedFood] = []
-    @Published var dinnerFoods: [FDCSelectedFood] = []
-    @Published var snacksFoods: [FDCSelectedFood] = []
+    // Handle the session unactived error. WCSession commands require an activated session.
+    //
+//    private func handleSessionUnactivated(with commandStatus: CommandStatus) {
+//        var mutableStatus = commandStatus
+//        mutableStatus.phrase = .failed
+//        mutableStatus.errorMessage =  "WCSession is not activeted yet!"
+//        postNotificationOnMainQueueAsync(name: .dataDidFlow, object: commandStatus)
+//    }
+    
+}
+
+
+class FDCDayMeals: ObservableObject, SessionActions {
+
+    
+    var breakfastFoods: [FDCSelectedFood] = [] {
+        willSet {
+            objectWillChange.send()
+        }
+        didSet {
+            sendMessage(createPayload())
+        }
+    }
+    
+     var lunchFoods: [FDCSelectedFood] = []{
+        willSet {
+            objectWillChange.send()
+        }
+        didSet {
+            sendMessage(createPayload())
+        }
+    }
+    
+    var dinnerFoods: [FDCSelectedFood] = [] {
+        willSet {
+            objectWillChange.send()
+        }
+        didSet {
+            sendMessage(createPayload())
+        }
+    }
+    
+    var snacksFoods: [FDCSelectedFood] = [] {
+        willSet {
+            objectWillChange.send()
+        }
+        didSet {
+            sendMessage(createPayload())
+        }
+    }
     
     
     let carbsLimit = 360
@@ -206,6 +279,24 @@ class FDCDayMeals: ObservableObject {
         }else{
             return "\(abs(left))g over"
         }
+    }
+    
+    func createPayload() -> [String: Any] {
+        var message: [String: Any] = [:]
+        
+        message[PayloadKey.protein] = calculateTotalProtein()
+        message[PayloadKey.carbs] = calculateTotalCarbs()
+        message[PayloadKey.fat] = calculateTotalFat()
+        message[PayloadKey.eatenCal] = calculateTotalCalories()
+        
+        
+        message[PayloadKey.proteinLeft] = calculateProteinLeft()//calculateTotalProtein()
+        message[PayloadKey.carbsLeft] = calculateCarbsLeft()
+        message[PayloadKey.fatLeft] = calculateFatLeft()
+        
+        message[PayloadKey.eatenCalPercentage] = calculateEatenCalPercentage()
+        
+        return message
     }
     
 }

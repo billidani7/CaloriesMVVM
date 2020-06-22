@@ -16,7 +16,7 @@ class AddMealViewModel: ObservableObject {
     
     var mealType: MealType
     
-    private var searchPublisher: AnyPublisher<FDCSearchFoodResponce, Never>?
+    private var searchPublisher: AnyPublisher<FDCSearchFoodResponce, APIError>?
     
     private var searchCancellable: AnyCancellable? {
         willSet {

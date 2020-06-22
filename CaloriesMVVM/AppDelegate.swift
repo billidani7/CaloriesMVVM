@@ -7,13 +7,30 @@
 //
 
 import UIKit
+import WatchConnectivity
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
-
+    private lazy var sessionDelegater: SessionDelegater = {
+        return SessionDelegater()
+    }()
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        
+        // Trigger WCSession activation at the early phase of app launching.
+        //
+        assert(WCSession.isSupported(), "This sample requires Watch Connectivity support!")
+        WCSession.default.delegate = sessionDelegater
+        WCSession.default.activate()
+        
+        // Remind the setup of WatchSettings.sharedContainerID.
+        //
+        if WatchSettings.sharedContainerID.isEmpty {
+            print("Specify a shared container ID for WatchSettings.sharedContainerID to use watch settings!")
+        }
+        
+        
         // Override point for customization after application launch.
         UITableView.appearance().backgroundColor = UIColor.clear
         

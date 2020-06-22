@@ -28,7 +28,7 @@ class FoodDetailViewModel: ObservableObject {
         }
     }
     
-    private var detailPublisher: AnyPublisher<FDCFoodDetail, FDCClient.APIError>?
+    private var detailPublisher: AnyPublisher<FDCFoodDetail, APIError>?
     private var detailCancellable: AnyCancellable? {
         willSet {
             detailCancellable?.cancel()
@@ -55,9 +55,18 @@ class FoodDetailViewModel: ObservableObject {
             .map{$0}
             .subscribe(on: DispatchQueue.global())
             .receive(on: DispatchQueue.main)
-            .sink(receiveCompletion: { (error) in
-                print("request foodDetail error: \(String(describing: error))")
-            }, receiveValue: { (result) in
+            .sink(receiveCompletion: {[weak self] value in
+                guard let self = self else { return }
+                switch value {
+                case .failure:
+                  self.foodDetail = nil
+                case .finished:
+                  break
+                }
+                
+            }, receiveValue: { [weak self] result in
+                guard let self = self else { return }
+
                 self.foodDetail = result
             })
         
