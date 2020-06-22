@@ -29,18 +29,10 @@ struct PayloadKey {
 // the information in Settings-Watch.bundle.
 //
 struct WatchSettings {
-    static let sharedContainerID = "group.dani.calories" // Specify your group container ID here and Root.plist to make watch settings work.
-    //static let sharedContainerID = "group.com.example.apple-samplecode.SimpleWatchConnectivity"
-    //static let useLogFileForFileTransfer = "useLogFileForFileTransfer"
-    //static let clearLogsAfterTransferred = "clearLogsAfterTransferred"
+    static let sharedContainerID = "group.dani.calories" // Specify your group container ID here and
 }
 
 protocol DataProvider {
     var message: [String: Any] { get }
 }
 
-
-//extension DataProvider {
-//
-//    var message
-//}

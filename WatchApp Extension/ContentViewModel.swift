@@ -51,19 +51,5 @@ class ContentViewModel: ObservableObject {
         self.fatLeft = "\(message[PayloadKey.fatLeft] ?? "-")"
         self.eatenCallPercentage = message[PayloadKey.eatenCalPercentage] as? Int ?? 0
         
-//        // If the data is from current channel, simple update color and time stamp, then return.
-//        //
-//        if commandStatus.command == command {
-//            updateUI(with: commandStatus, errorMessage: commandStatus.errorMessage)
-//            return
-//        }
-//        
-//        // Move the screen to the page matching the data channel, then update the color and time stamp.
-//        //
-//        if let index = type(of: self).instances.index(where: { $0.command == commandStatus.command }) {
-//            let controller = MainInterfaceController.instances[index]
-//            controller.becomeCurrentPage()
-//            controller.updateUI(with: commandStatus, errorMessage: commandStatus.errorMessage)
-//        }
     }
 }

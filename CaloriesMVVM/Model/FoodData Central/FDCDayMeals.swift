@@ -25,27 +25,16 @@ extension SessionActions {
         
         WCSession.default.sendMessage(message, replyHandler: { replyMessage in
             print("WCSession.default.sendMessage = \(replyMessage)")
-//            commandStatus.phrase = .replied
-//            commandStatus.timedColor = TimedColor(replyMessage)
-//            self.postNotificationOnMainQueueAsync(name: .dataDidFlow, object: commandStatus)
+
 
         }, errorHandler: { error in
             print("WCSession.default.sendMessage Error = \(error.localizedDescription)")
-//            commandStatus.phrase = .failed
-//            commandStatus.errorMessage = error.localizedDescription
-//            self.postNotificationOnMainQueueAsync(name: .dataDidFlow, object: commandStatus)
+
         })
-        //postNotificationOnMainQueueAsync(name: .dataDidFlow, object: commandStatus)
+        
     }
     
-    // Handle the session unactived error. WCSession commands require an activated session.
-    //
-//    private func handleSessionUnactivated(with commandStatus: CommandStatus) {
-//        var mutableStatus = commandStatus
-//        mutableStatus.phrase = .failed
-//        mutableStatus.errorMessage =  "WCSession is not activeted yet!"
-//        postNotificationOnMainQueueAsync(name: .dataDidFlow, object: commandStatus)
-//    }
+
     
 }
 

@@ -682,8 +682,8 @@
             filePath = "CaloriesMVVM/Model/FoodData Central/FDCDayMeals.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "61"
-            endingLineNumber = "61"
+            startingLineNumber = "50"
+            endingLineNumber = "50"
             landmarkName = "breakfastFoods"
             landmarkType = "24">
          </BreakpointContent>
