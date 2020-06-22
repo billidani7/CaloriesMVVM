@@ -190,6 +190,7 @@ struct FDCClient: FDCActions {
 ### Links
 - [Stanford University Lecture](https://www.youtube.com/watch?v=4GjXq2Sr55Q) 
 - [Apple Combine Framework](https://developer.apple.com/documentation/combine)
+- [Video preview](https://youtu.be/NQwZiqkIP2w)
 
 ## What's next
 If you are interested for one more powerfull design pattern, take a look [here](https://github.com/billidani7/MoviesComposableArchitecture).
