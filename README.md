@@ -1,3 +1,10 @@
+### Update 
+I added a Watch app that communicates with iPhone app using the Watch Connectivity framework. The next step is to integrate the apps with CloudKit.
+<p align="center">
+
+<img src="WatchkitApp.png">
+</p>
+
 The purpose of this demo is to show the basic aspects of MVVM Architecture using SwiftUI & Combine framework. 
 
 As I was looking for a nice design for this demo, I found this beautiful [template](https://ui8.net/emer-dang/products/iofit---diet--training-app-ui-kit). I exported some basic assets/icons. I made the rest of the design through SwiftUI (Views and Modifiers). 
